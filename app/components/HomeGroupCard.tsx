@@ -56,12 +56,14 @@ export default function HomeGroupCard({ name, runners, colors, routeName, imageF
             <div className="px-5 pt-4 pb-2">
               <h3 className="font-bold text-xl text-gray-900">{routeName}</h3>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/routes/${imageFile}`}
-              alt={routeName}
-              className="w-full object-contain max-h-96"
-            />
+            <div className="px-4 pb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/routes/${imageFile}`}
+                alt={routeName}
+                className="w-full object-contain max-h-96 rounded-xl"
+              />
+            </div>
           </>
         ) : (
           <p className="px-5 py-5 text-gray-400 italic">No route assigned yet</p>
