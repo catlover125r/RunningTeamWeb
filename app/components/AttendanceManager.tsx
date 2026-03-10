@@ -217,14 +217,16 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
                         'bg-gray-50 border-gray-200'
                       }`}
                     >
-                      <span className={`text-sm font-medium ${
+                      <span className={`text-sm font-medium min-w-0 truncate ${
                         status === 'present' ? 'text-green-800' :
                         status === 'absent'  ? 'text-red-700' :
                         'text-gray-600'
                       }`}>
                         {name}
                       </span>
-                      <StatusToggle status={status} onChange={s => setStatus(name, s)} />
+                      <div className="shrink-0">
+                        <StatusToggle status={status} onChange={s => setStatus(name, s)} />
+                      </div>
                     </div>
                   );
                 })}
