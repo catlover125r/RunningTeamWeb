@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -60,9 +61,7 @@ export default function Header({ isLoggedIn, isCoach }: HeaderProps) {
       <header className="bg-purple-800 text-white shadow-lg">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg group-hover:bg-purple-400 transition-colors">
-              SQ
-            </div>
+            <Image src="/logo.png" alt="Sequoia XC" width={40} height={40} className="rounded-full" />
             <div>
               <div className="font-bold text-lg leading-tight">Sequoia XC</div>
               <div className="text-purple-300 text-xs leading-tight">Sequoia High School</div>
