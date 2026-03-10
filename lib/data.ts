@@ -41,6 +41,29 @@ const DEFAULT_CONFIG: Config = {
       runners: ['Jacob Reynolds', 'Sachin Paranjpye', 'Dylan Bringley', 'Ben Carter'],
     },
   ],
+  attendanceRoster: [
+    {
+      label: 'Boys',
+      runners: [
+        'Alex Corpos', 'Ben Carter', 'Benjamin Rosen', 'Brennan Sherman', 'Caleb Streck',
+        'Cole Myers', 'Colin Chow', 'Colin Henderson', 'Dylan Bringley', 'Eli Michael',
+        'Elliot Rios', 'Ethan Butt', 'Henry Giardi', 'Jacob Reynolds', 'Jose Can',
+        'Kai Rechin', 'Luca Chung', 'Luke Popler', 'Massimo Ramezane', 'Matthew Biggs',
+        'Matthew Macedo', 'Meezahn Kemal', 'Reed Murphy', 'Rohan Sanghvi', 'Sabian Paul',
+        'Sachin Paranjpye', 'Senahn Kemal', 'Teddy Tidwell', 'Tiernan Weaver',
+        'Viggo Laustsen', 'Will Raymond',
+      ],
+    },
+    {
+      label: 'Girls',
+      runners: [
+        'Alessa Moretti', 'Alisa Portner', 'Audrey Bringley', 'Ava Wu', 'Celestine Nolf',
+        'Edyn McKenna', 'Edyth Tidwell', 'Elena Dils', 'Elisabeth Diamond',
+        'Elisabetta Holloszy', 'Elise Leparmentier', 'Ellie Markworth', 'Fei Hwang',
+        'Nina Vijeh', 'Reese Skye', "Sabine O'Hara", 'Teri Sullivan',
+      ],
+    },
+  ],
   routes: [
     { id: 'britten', name: 'Britten', description: 'Loop through the Britten neighborhood', distance: '', imageFile: 'britten.png' },
     { id: 'bair-island', name: 'Bair Island', description: 'Out and back to Bair Island along the bay', distance: '', imageFile: 'bair-island.png' },
@@ -150,17 +173,16 @@ export async function deleteAnnouncement(id: string): Promise<void> {
   await db.collection('announcements').doc(id).delete();
 }
 
-export async function getAttendance(date: string, groupId: string): Promise<AttendanceRecord | null> {
+export async function getAttendance(date: string): Promise<AttendanceRecord | null> {
   const db = getDb();
-  const doc = await db.collection('attendance').doc(`${date}_${groupId}`).get();
+  const doc = await db.collection('attendance').doc(date).get();
   if (!doc.exists) return null;
   return doc.data() as AttendanceRecord;
 }
 
 export async function saveAttendance(record: AttendanceRecord): Promise<void> {
   const db = getDb();
-  const key = `${record.date}_${record.groupId}`;
-  await db.collection('attendance').doc(key).set(record);
+  await db.collection('attendance').doc(record.date).set(record);
 }
 
 export async function getAllAttendance(): Promise<AttendanceRecord[]> {

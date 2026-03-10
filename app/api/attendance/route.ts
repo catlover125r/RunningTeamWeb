@@ -11,10 +11,9 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get('date');
-  const groupId = searchParams.get('groupId');
 
-  if (date && groupId) {
-    const record = await getAttendance(date, groupId);
+  if (date) {
+    const record = await getAttendance(date);
     return NextResponse.json(record || null);
   }
 
@@ -28,14 +27,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Coach access required' }, { status: 403 });
   }
 
-  const body = await request.json() as AttendanceRecord;
-  const { date, groupId, runners } = body;
+  const body = await request.json();
+  const { date, runners } = body;
 
-  if (!date || !groupId || !Array.isArray(runners)) {
-    return NextResponse.json({ error: 'date, groupId, and runners are required' }, { status: 400 });
+  if (!date || !Array.isArray(runners)) {
+    return NextResponse.json({ error: 'date and runners are required' }, { status: 400 });
   }
 
-  const record: AttendanceRecord = { date, groupId, runners };
+  const record: AttendanceRecord = { date, runners };
   await saveAttendance(record);
 
   return NextResponse.json({ success: true });

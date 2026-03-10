@@ -14,27 +14,24 @@ export default async function AttendancePage() {
 
   const config = await getConfig();
   const allAttendance = await getAllAttendance();
-
-  // Today's date in YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0];
 
-  // Strip access codes
-  const publicGroups = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
+  const roster = config.attendanceRoster ?? [
+    { label: 'Boys', runners: config.groups.flatMap(g => g.runners) },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-1">
-          <a href="/schedule" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            &larr; Back to Schedule
-          </a>
-        </div>
-        <h1 className="text-3xl font-extrabold text-gray-900">Attendance Tracking</h1>
-        <p className="text-gray-500 mt-1">Record daily attendance for each running group.</p>
+        <a href="/schedule" className="text-sm text-purple-600 hover:text-purple-800 transition-colors">
+          &larr; Back to Schedule
+        </a>
+        <h1 className="text-3xl font-extrabold text-gray-900 mt-2">Attendance</h1>
+        <p className="text-gray-500 mt-1">Record daily attendance for the full team.</p>
       </div>
 
       <AttendanceManager
-        groups={publicGroups}
+        roster={roster}
         initialRecords={allAttendance}
         today={today}
       />

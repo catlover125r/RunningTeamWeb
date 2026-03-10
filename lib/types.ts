@@ -36,16 +36,23 @@ export type Announcement = {
   author: string;
 };
 
+export type AttendanceStatus = 'present' | 'absent' | 'unknown';
+
 export type AttendanceRecord = {
   date: string;
-  groupId: string;
-  runners: { name: string; present: boolean }[];
+  runners: { name: string; status: AttendanceStatus }[];
+};
+
+export type AttendanceRosterSection = {
+  label: string;
+  runners: string[];
 };
 
 export type Config = {
   groups: Group[];
   routes: Route[];
   coachCode: string;
+  attendanceRoster?: AttendanceRosterSection[];
 };
 
 export type AuthSession = {
