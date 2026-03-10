@@ -61,7 +61,7 @@ export default function HomeGroupCard({ name, runners, colors, routeName, imageF
               <img
                 src={`/routes/${imageFile}`}
                 alt={routeName}
-                className="w-full object-contain max-h-96 rounded-xl"
+                className="w-full object-contain max-h-96 rounded-2xl shadow-md"
               />
             </div>
           </>

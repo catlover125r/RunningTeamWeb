@@ -235,7 +235,7 @@ export default function ScheduleEditor({
                         <img
                           src={`/routes/${selectedRoute.imageFile}`}
                           alt={selectedRoute.name}
-                          className="w-full rounded-lg border border-gray-100"
+                          className="w-full rounded-2xl shadow-md"
                           style={{ maxHeight: '480px', objectFit: 'contain', objectPosition: 'center' }}
                         />
                       )}
