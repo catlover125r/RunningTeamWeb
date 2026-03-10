@@ -22,17 +22,18 @@ interface ScheduleEditorProps {
   currentHour: number;
 }
 
+// All groups use purple shades — keyed by the stored color value
 const COLOR_MAP: Record<string, {
   headerBg: string;
   badge: string;
   accent: string;
   todayBadge: string;
 }> = {
-  blue:   { headerBg: 'bg-blue-700',   badge: 'bg-blue-100 text-blue-800',     accent: 'text-blue-600',   todayBadge: 'bg-blue-100 text-blue-700' },
-  green:  { headerBg: 'bg-green-700',  badge: 'bg-green-100 text-green-800',   accent: 'text-green-600',  todayBadge: 'bg-green-100 text-green-700' },
-  orange: { headerBg: 'bg-orange-600', badge: 'bg-orange-100 text-orange-800', accent: 'text-orange-600', todayBadge: 'bg-orange-100 text-orange-700' },
-  purple: { headerBg: 'bg-purple-700', badge: 'bg-purple-100 text-purple-800', accent: 'text-purple-600', todayBadge: 'bg-purple-100 text-purple-700' },
-  pink:   { headerBg: 'bg-pink-600',   badge: 'bg-pink-100 text-pink-800',     accent: 'text-pink-600',   todayBadge: 'bg-pink-100 text-pink-700' },
+  pink:   { headerBg: 'bg-purple-600', badge: 'bg-purple-100 text-purple-700', accent: 'text-purple-600', todayBadge: 'bg-purple-100 text-purple-600' },
+  purple: { headerBg: 'bg-purple-900', badge: 'bg-purple-100 text-purple-900', accent: 'text-purple-900', todayBadge: 'bg-purple-100 text-purple-900' },
+  blue:   { headerBg: 'bg-purple-800', badge: 'bg-purple-100 text-purple-800', accent: 'text-purple-800', todayBadge: 'bg-purple-100 text-purple-800' },
+  green:  { headerBg: 'bg-purple-700', badge: 'bg-purple-100 text-purple-700', accent: 'text-purple-700', todayBadge: 'bg-purple-100 text-purple-700' },
+  orange: { headerBg: 'bg-purple-500', badge: 'bg-purple-100 text-purple-600', accent: 'text-purple-500', todayBadge: 'bg-purple-100 text-purple-600' },
 };
 
 type Toast = { id: number; message: string; type: 'success' | 'error' };
@@ -151,7 +152,7 @@ export default function ScheduleEditor({
                   <h3 className="text-white font-bold text-lg">{group.name}</h3>
                   <button
                     onClick={() => setExpandedRosters(prev => ({ ...prev, [group.id]: !prev[group.id] }))}
-                    className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm transition-colors"
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm px-3 py-1.5 rounded-full transition-colors font-medium"
                   >
                     <span>{group.runners.length} runners</span>
                     <svg className={`w-4 h-4 transition-transform ${expandedRosters[group.id] ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

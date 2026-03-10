@@ -9,37 +9,13 @@ interface PublicGroup {
   runners: string[];
 }
 
+// All groups use purple shades — keyed by the stored color value
 const COLOR_MAP: Record<string, { bg: string; border: string; badge: string; text: string }> = {
-  blue: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    badge: 'bg-blue-600 text-white',
-    text: 'text-blue-700',
-  },
-  green: {
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    badge: 'bg-green-600 text-white',
-    text: 'text-green-700',
-  },
-  orange: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-200',
-    badge: 'bg-orange-500 text-white',
-    text: 'text-orange-700',
-  },
-  purple: {
-    bg: 'bg-purple-50',
-    border: 'border-purple-200',
-    badge: 'bg-purple-700 text-white',
-    text: 'text-purple-700',
-  },
-  pink: {
-    bg: 'bg-pink-50',
-    border: 'border-pink-200',
-    badge: 'bg-pink-600 text-white',
-    text: 'text-pink-600',
-  },
+  pink:   { bg: 'bg-purple-50', border: 'border-purple-300', badge: 'bg-purple-600 text-white', text: 'text-purple-600' },
+  purple: { bg: 'bg-purple-50', border: 'border-purple-800', badge: 'bg-purple-900 text-white', text: 'text-purple-900' },
+  blue:   { bg: 'bg-purple-50', border: 'border-purple-600', badge: 'bg-purple-800 text-white', text: 'text-purple-800' },
+  green:  { bg: 'bg-purple-50', border: 'border-purple-500', badge: 'bg-purple-700 text-white', text: 'text-purple-700' },
+  orange: { bg: 'bg-purple-50', border: 'border-purple-400', badge: 'bg-purple-500 text-white', text: 'text-purple-500' },
 };
 
 export default async function HomePage() {
@@ -48,22 +24,17 @@ export default async function HomePage() {
   const schedule = await getSchedule(weekOf);
   const announcements = await getAnnouncements();
   const groups: PublicGroup[] = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
-  const routes = config.routes;
 
   const today = new Date();
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const todayName = dayNames[today.getDay()];
   const isWeekend = today.getDay() === 0 || today.getDay() === 6;
 
-  function getRoute(routeId: string | null | undefined): Route | null {
-    if (!routeId) return null;
-    return routes.find((r) => r.id === routeId) || null;
-  }
-
   function getTodayRoute(group: PublicGroup): Route | null {
     const groupSchedule = (schedule as WeekSchedule | null)?.groups?.[group.id];
-    const dayData = groupSchedule?.[todayName];
-    return getRoute(dayData?.routeId);
+    const routeId = groupSchedule?.[todayName]?.routeId;
+    if (!routeId) return null;
+    return config.routes.find((r) => r.id === routeId) || null;
   }
 
   return (
@@ -136,23 +107,6 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Routes Legend */}
-      <section className="mt-10">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Available Routes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {routes.map((route) => (
-            <div key={route.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className="font-semibold text-gray-800">{route.name}</h3>
-                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full whitespace-nowrap font-medium">
-                  {route.distance}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">{route.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
