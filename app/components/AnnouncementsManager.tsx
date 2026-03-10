@@ -78,7 +78,7 @@ export default function AnnouncementsManager({ initialAnnouncements }: Props) {
             onChange={(e) => setNewContent(e.target.value)}
             placeholder="Write an announcement for the team..."
             rows={3}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
           />
           {error && (
             <p className="text-sm text-red-600">{error}</p>
@@ -87,7 +87,7 @@ export default function AnnouncementsManager({ initialAnnouncements }: Props) {
             <button
               type="submit"
               disabled={posting || !newContent.trim()}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-lg transition-colors text-sm"
+              className="px-5 py-2 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white font-medium rounded-lg transition-colors text-sm"
             >
               {posting ? 'Posting...' : 'Post Announcement'}
             </button>
@@ -118,7 +118,7 @@ export default function AnnouncementsManager({ initialAnnouncements }: Props) {
             {announcements.map((announcement) => (
               <div
                 key={announcement.id}
-                className="bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4 flex items-start gap-4"
+                className="bg-purple-50 border border-purple-200 rounded-xl px-5 py-4 flex items-start gap-4"
               >
                 <div className="flex-1">
                   <p className="text-gray-800 font-medium">{announcement.content}</p>

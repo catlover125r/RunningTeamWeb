@@ -1,6 +1,7 @@
 import { Route, WeekSchedule } from '@/lib/types';
 import { getConfig, getSchedule, getAnnouncements, getMondayOfWeek } from '@/lib/data';
 import AnnouncementBanner from './components/AnnouncementBanner';
+import HomeGroupCard from './components/HomeGroupCard';
 
 interface PublicGroup {
   id: string;
@@ -71,34 +72,14 @@ export default async function HomePage() {
               const route = getTodayRoute(group);
 
               return (
-                <div
+                <HomeGroupCard
                   key={group.id}
-                  className={`rounded-xl border-2 ${colors.border} ${colors.bg} overflow-hidden shadow-sm`}
-                >
-                  <div className="px-5 py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${colors.badge}`}>
-                      {group.name}
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">Today&apos;s Route</p>
-                  </div>
-                  <div className="bg-white border-t border-gray-100">
-                    {route ? (
-                      <>
-                        <div className="px-5 pt-4 pb-2">
-                          <h3 className="font-bold text-xl text-gray-900">{route.name}</h3>
-                        </div>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`/routes/${route.imageFile}`}
-                          alt={route.name}
-                          className="w-full object-contain max-h-96"
-                        />
-                      </>
-                    ) : (
-                      <p className="px-5 py-5 text-gray-400 italic">No route assigned yet</p>
-                    )}
-                  </div>
-                </div>
+                  name={group.name}
+                  runners={group.runners}
+                  colors={colors}
+                  routeName={route?.name}
+                  imageFile={route?.imageFile}
+                />
               );
             })}
           </div>

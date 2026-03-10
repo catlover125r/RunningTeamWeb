@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { AttendanceRecord, AttendanceStatus, AttendanceRosterSection } from '@/lib/types';
 
 interface Props {
@@ -57,8 +57,22 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
   const [records, setRecords] = useState<AttendanceRecord[]>(initialRecords);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   const allRunners = roster.flatMap(s => s.runners);
+
+  const absenceCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allRunners.forEach(n => { counts[n] = 0; });
+    records.forEach(r => {
+      r.runners.forEach(runner => {
+        if (runner.status === 'absent') {
+          counts[runner.name] = (counts[runner.name] || 0) + 1;
+        }
+      });
+    });
+    return counts;
+  }, [records, allRunners]);
 
   function getRecord(date: string): AttendanceRecord | null {
     return records.find(r => r.date === date) || null;
@@ -107,6 +121,55 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
 
   return (
     <div className="space-y-6">
+      {/* Absence Report Modal */}
+      {showReport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setShowReport(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900">Absence Report</h2>
+              <button onClick={() => setShowReport(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-6 py-4 space-y-6">
+              {roster.map(section => {
+                const sorted = [...section.runners].sort((a, b) => (absenceCounts[b] || 0) - (absenceCounts[a] || 0));
+                return (
+                  <div key={section.label}>
+                    <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-2">{section.label}</h3>
+                    <div className="space-y-1">
+                      {sorted.map(name => {
+                        const count = absenceCounts[name] || 0;
+                        return (
+                          <div key={name} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
+                            <span className="text-sm text-gray-700">{name}</span>
+                            <span className={`text-sm font-semibold min-w-[2rem] text-right ${count === 0 ? 'text-gray-400' : count >= 3 ? 'text-red-600' : 'text-orange-500'}`}>
+                              {count === 0 ? '—' : count}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top action bar */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowReport(true)}
+          className="px-4 py-2 text-sm font-medium text-purple-700 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
+        >
+          Absence Report
+        </button>
+      </div>
+
       {/* Date picker + summary */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
