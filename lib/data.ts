@@ -40,11 +40,17 @@ const DEFAULT_CONFIG: Config = {
     },
   ],
   routes: [
-    { id: 'loop1', name: 'Campus Loop', description: 'Easy recovery run around the school campus', distance: '3.2 miles', imageFile: 'campus-loop.jpg' },
-    { id: 'hills', name: 'Hill Repeats', description: 'Challenging hill workout on Oak Street', distance: '4.5 miles', imageFile: 'hill-repeats.jpg' },
-    { id: 'park', name: 'Riverside Park', description: 'Flat tempo run along the river trail', distance: '5.0 miles', imageFile: 'riverside-park.jpg' },
-    { id: 'long', name: 'Long Run', description: 'Weekly long run through the neighborhood', distance: '7.0 miles', imageFile: 'long-run.jpg' },
-    { id: 'track', name: 'Track Workout', description: 'Speed intervals on the school track', distance: '4.0 miles', imageFile: 'track.jpg' },
+    { id: 'britten', name: 'Britten', description: 'Loop through the Britten neighborhood', distance: '', imageFile: 'britten.png' },
+    { id: 'bair-island', name: 'Bair Island', description: 'Out and back to Bair Island along the bay', distance: '', imageFile: 'bair-island.png' },
+    { id: 'emerald-hills', name: 'Emerald Hills', description: 'Hilly loop through Emerald Hills', distance: '', imageFile: 'emerald-hills.png' },
+    { id: 'mcloop', name: 'Mcloop', description: 'Loop through the neighborhood near Mcauley Park', distance: '', imageFile: 'mcloop.png' },
+    { id: 'around-school', name: 'Around the School', description: 'Short loop around the school campus', distance: '', imageFile: 'around-school.png' },
+    { id: 'prison', name: 'Prison', description: 'Run out toward the waterfront near the old prison', distance: '', imageFile: 'prison.png' },
+    { id: 'terris', name: 'Terris', description: 'Loop through the Terris neighborhood', distance: '', imageFile: 'terris.png' },
+    { id: 'burton', name: 'Burton', description: 'Long loop through Burton and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
+    { id: 'laural-trader-joes', name: 'Laural/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
+    { id: 'stulsaft', name: 'Stulsaft', description: 'Loop through the hills toward Stulsaft Park', distance: '', imageFile: 'stulsaft.png' },
+    { id: 'howard', name: 'Howard', description: 'Loop through the Howard neighborhood', distance: '', imageFile: 'howard.png' },
   ],
 };
 

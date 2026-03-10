@@ -70,17 +70,10 @@ export default async function HomePage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Hero */}
       <section className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          <span className="w-2 h-2 bg-purple-500 rounded-full inline-block"></span>
-          Season in Progress
-        </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
           Sequoia High School<br />
           <span className="text-purple-700">Cross Country</span>
         </h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">
-          Today&apos;s route for Boys and Girls XC.
-        </p>
       </section>
 
       {/* Announcements */}
@@ -117,15 +110,23 @@ export default async function HomePage() {
                     </span>
                     <p className="text-xs text-gray-500 mt-1">Today&apos;s Route</p>
                   </div>
-                  <div className="px-5 py-5 bg-white border-t border-gray-100">
+                  <div className="bg-white border-t border-gray-100">
                     {route ? (
                       <>
-                        <h3 className="font-bold text-xl text-gray-900">{route.name}</h3>
-                        <p className="text-purple-700 font-medium text-sm mt-1">{route.distance}</p>
-                        <p className="text-gray-500 text-sm mt-2">{route.description}</p>
+                        <div className="px-5 pt-4 pb-2">
+                          <h3 className="font-bold text-xl text-gray-900">{route.name}</h3>
+                          {route.distance && <p className="text-purple-700 font-medium text-sm mt-1">{route.distance}</p>}
+                          <p className="text-gray-500 text-sm mt-1">{route.description}</p>
+                        </div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/routes/${route.imageFile}`}
+                          alt={route.name}
+                          className="w-full object-contain max-h-64"
+                        />
                       </>
                     ) : (
-                      <p className="text-gray-400 italic">No route assigned yet</p>
+                      <p className="px-5 py-5 text-gray-400 italic">No route assigned yet</p>
                     )}
                   </div>
                 </div>
