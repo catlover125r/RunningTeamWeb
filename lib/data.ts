@@ -79,6 +79,44 @@ export function getMondayOfWeek(date: Date): string {
   return d.toISOString().split('T')[0];
 }
 
+const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+export interface ScheduleDay {
+  dateStr: string;   // "2026-03-10"
+  dayName: string;   // "tuesday"
+  weekOf: string;    // "2026-03-09"
+  label: string;     // "Tue 3/10"
+  isToday: boolean;
+}
+
+export function getUpcomingPracticeDays(now: Date): ScheduleDay[] {
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  const days: ScheduleDay[] = [];
+  const cursor = new Date(today);
+
+  while (days.length < 5) {
+    const dow = cursor.getDay();
+    if (dow >= 1 && dow <= 5) {
+      const dateStr = cursor.toISOString().split('T')[0];
+      const month = cursor.getMonth() + 1;
+      const date = cursor.getDate();
+      const dayAbbr = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dow];
+      days.push({
+        dateStr,
+        dayName: DAY_NAMES[dow],
+        weekOf: getMondayOfWeek(cursor),
+        label: `${dayAbbr} ${month}/${date}`,
+        isToday: dateStr === todayStr,
+      });
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
+}
+
 export async function getSchedule(weekOf: string): Promise<WeekSchedule> {
   const db = getDb();
   const doc = await db.collection('schedules').doc(weekOf).get();

@@ -1,16 +1,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { getConfig, getSchedule, getMondayOfWeek } from '@/lib/data';
+import { getConfig, getSchedule, getUpcomingPracticeDays } from '@/lib/data';
+import { WeekSchedule } from '@/lib/types';
 import ScheduleEditor from '@/app/components/ScheduleEditor';
-
-const DAY_NAMES_MAP: Record<number, string> = {
-  1: 'monday',
-  2: 'tuesday',
-  3: 'wednesday',
-  4: 'thursday',
-  5: 'friday',
-};
 
 export default async function SchedulePage() {
   const cookieStore = await cookies();
@@ -22,13 +15,18 @@ export default async function SchedulePage() {
 
   const config = await getConfig();
   const now = new Date();
-  const weekOf = getMondayOfWeek(now);
-  const schedule = await getSchedule(weekOf);
+  const days = getUpcomingPracticeDays(now);
 
-  const todayDayName = DAY_NAMES_MAP[now.getDay()] || null;
+  // Load schedules for all unique weeks in the rolling window
+  const uniqueWeeks = [...new Set(days.map(d => d.weekOf))];
+  const weekSchedules = await Promise.all(uniqueWeeks.map(w => getSchedule(w)));
+  const schedules: Record<string, WeekSchedule> = Object.fromEntries(
+    uniqueWeeks.map((w, i) => [w, weekSchedules[i]])
+  );
+
+  const todayDateStr = now.toISOString().split('T')[0];
   const currentHour = now.getHours();
 
-  // Strip access codes from groups for client
   const publicGroups = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
 
   return (
@@ -37,23 +35,21 @@ export default async function SchedulePage() {
         <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Schedule Management</h1>
         <p className="text-gray-500">
           {session.type === 'coach'
-            ? 'Assign routes to any group for each day of the week.'
-            : `Set routes for your group's practice this week.`}
+            ? 'Assign routes to any group for the next 5 practice days.'
+            : `Set routes for your group's upcoming practices.`}
         </p>
       </div>
 
-      {session.type === 'coach' && (
-        <CoachAnnouncementPanel />
-      )}
+      {session.type === 'coach' && <CoachAnnouncementPanel />}
 
       <ScheduleEditor
         groups={publicGroups}
         routes={config.routes}
-        weekOf={weekOf}
-        initialSchedule={schedule}
+        days={days}
+        initialSchedules={schedules}
         sessionType={session.type}
         sessionGroupId={session.groupId}
-        todayDayName={todayDayName}
+        todayDateStr={todayDateStr}
         currentHour={currentHour}
       />
     </div>

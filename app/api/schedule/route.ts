@@ -31,26 +31,34 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { day, routeId, groupId: bodyGroupId } = body;
+  const { day, routeId, groupId: bodyGroupId, weekOf: bodyWeekOf, dateStr } = body;
 
   if (!day || !DAYS.includes(day)) {
     return NextResponse.json({ error: 'Invalid day. Must be monday through friday.' }, { status: 400 });
   }
 
   const now = new Date();
-  const todayDayName = DAY_NAMES_MAP[now.getDay()];
+  const todayStr = now.toISOString().split('T')[0];
   const currentHour = now.getHours();
 
-  // Check 5pm cutoff for today
-  if (todayDayName === day && currentHour >= 17) {
-    return NextResponse.json({ error: 'Changes are locked after 5pm' }, { status: 403 });
-  }
-
-  // Check past days
-  const dayIndex = DAYS.indexOf(day);
-  const todayIndex = todayDayName ? DAYS.indexOf(todayDayName) : -1;
-  if (todayIndex >= 0 && dayIndex < todayIndex) {
-    return NextResponse.json({ error: 'Cannot change routes for past days' }, { status: 403 });
+  // Check past days and 5pm cutoff using dateStr if provided, else fall back to day-of-week logic
+  if (dateStr) {
+    if (dateStr < todayStr) {
+      return NextResponse.json({ error: 'Cannot change routes for past days' }, { status: 403 });
+    }
+    if (dateStr === todayStr && currentHour >= 17) {
+      return NextResponse.json({ error: 'Changes are locked after 5pm' }, { status: 403 });
+    }
+  } else {
+    const todayDayName = DAY_NAMES_MAP[now.getDay()];
+    if (todayDayName === day && currentHour >= 17) {
+      return NextResponse.json({ error: 'Changes are locked after 5pm' }, { status: 403 });
+    }
+    const dayIndex = DAYS.indexOf(day);
+    const todayIndex = todayDayName ? DAYS.indexOf(todayDayName) : -1;
+    if (todayIndex >= 0 && dayIndex < todayIndex) {
+      return NextResponse.json({ error: 'Cannot change routes for past days' }, { status: 403 });
+    }
   }
 
   // Validate routeId if provided
@@ -80,7 +88,7 @@ export async function POST(request: NextRequest) {
     targetGroupId = session.groupId;
   }
 
-  const weekOf = getMondayOfWeek(now);
+  const weekOf = bodyWeekOf || getMondayOfWeek(now);
   const schedule = await getSchedule(weekOf);
 
   const updatedBy = session.type === 'coach' ? 'Coach' : `Group: ${targetGroupId}`;

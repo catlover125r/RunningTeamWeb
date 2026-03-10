@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Route, WeekSchedule } from '@/lib/types';
+import { ScheduleDay } from '@/lib/data';
 
 interface Group {
   id: string;
@@ -13,182 +14,118 @@ interface Group {
 interface ScheduleEditorProps {
   groups: Group[];
   routes: Route[];
-  weekOf: string;
-  initialSchedule: WeekSchedule | null;
+  days: ScheduleDay[];
+  initialSchedules: Record<string, WeekSchedule>;
   sessionType: 'coach' | 'group';
   sessionGroupId?: string;
-  todayDayName: string | null;
+  todayDateStr: string;
   currentHour: number;
 }
-
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
-const DAY_LABELS: Record<string, string> = {
-  monday: 'Monday',
-  tuesday: 'Tuesday',
-  wednesday: 'Wednesday',
-  thursday: 'Thursday',
-  friday: 'Friday',
-};
 
 const COLOR_MAP: Record<string, {
   headerBg: string;
   badge: string;
   accent: string;
-  lockedBg: string;
+  todayBadge: string;
 }> = {
-  blue: {
-    headerBg: 'bg-blue-700',
-    badge: 'bg-blue-100 text-blue-800',
-    accent: 'text-blue-600',
-    lockedBg: 'bg-blue-50',
-  },
-  green: {
-    headerBg: 'bg-green-700',
-    badge: 'bg-green-100 text-green-800',
-    accent: 'text-green-600',
-    lockedBg: 'bg-green-50',
-  },
-  orange: {
-    headerBg: 'bg-orange-600',
-    badge: 'bg-orange-100 text-orange-800',
-    accent: 'text-orange-600',
-    lockedBg: 'bg-orange-50',
-  },
-  purple: {
-    headerBg: 'bg-purple-700',
-    badge: 'bg-purple-100 text-purple-800',
-    accent: 'text-purple-600',
-    lockedBg: 'bg-purple-50',
-  },
-  pink: {
-    headerBg: 'bg-pink-600',
-    badge: 'bg-pink-100 text-pink-800',
-    accent: 'text-pink-600',
-    lockedBg: 'bg-pink-50',
-  },
+  blue:   { headerBg: 'bg-blue-700',   badge: 'bg-blue-100 text-blue-800',     accent: 'text-blue-600',   todayBadge: 'bg-blue-100 text-blue-700' },
+  green:  { headerBg: 'bg-green-700',  badge: 'bg-green-100 text-green-800',   accent: 'text-green-600',  todayBadge: 'bg-green-100 text-green-700' },
+  orange: { headerBg: 'bg-orange-600', badge: 'bg-orange-100 text-orange-800', accent: 'text-orange-600', todayBadge: 'bg-orange-100 text-orange-700' },
+  purple: { headerBg: 'bg-purple-700', badge: 'bg-purple-100 text-purple-800', accent: 'text-purple-600', todayBadge: 'bg-purple-100 text-purple-700' },
+  pink:   { headerBg: 'bg-pink-600',   badge: 'bg-pink-100 text-pink-800',     accent: 'text-pink-600',   todayBadge: 'bg-pink-100 text-pink-700' },
 };
-
-function isDayLocked(day: string, todayDayName: string | null, currentHour: number): boolean {
-  const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-  const todayIdx = todayDayName ? dayOrder.indexOf(todayDayName) : -1;
-  const dayIdx = dayOrder.indexOf(day);
-
-  if (todayIdx < 0) return false; // weekend: nothing locked for past days by this logic
-
-  if (dayIdx < todayIdx) return true; // past day
-  if (dayIdx === todayIdx && currentHour >= 17) return true; // today after 5pm
-
-  return false;
-}
 
 type Toast = { id: number; message: string; type: 'success' | 'error' };
 
 export default function ScheduleEditor({
   groups,
   routes,
-  weekOf,
-  initialSchedule,
+  days,
+  initialSchedules,
   sessionType,
   sessionGroupId,
-  todayDayName,
+  todayDateStr,
   currentHour,
 }: ScheduleEditorProps) {
-  const [schedule, setSchedule] = useState<WeekSchedule>(
-    initialSchedule || { weekOf, groups: {} }
-  );
+  const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>(initialSchedules);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [saving, setSaving] = useState<string | null>(null); // "groupId:day"
+  const [saving, setSaving] = useState<string | null>(null);
   const [expandedRosters, setExpandedRosters] = useState<Record<string, boolean>>({});
 
   const addToast = useCallback((message: string, type: 'success' | 'error') => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
   }, []);
 
   const visibleGroups = sessionType === 'coach'
     ? groups
-    : groups.filter((g) => g.id === sessionGroupId);
+    : groups.filter(g => g.id === sessionGroupId);
 
-  async function handleRouteChange(groupId: string, day: string, routeId: string | null) {
-    const key = `${groupId}:${day}`;
+  function isDayLocked(day: ScheduleDay): boolean {
+    if (day.dateStr < todayDateStr) return true;
+    if (day.dateStr === todayDateStr && currentHour >= 17) return true;
+    return false;
+  }
+
+  function getRouteId(groupId: string, day: ScheduleDay): string {
+    return schedules[day.weekOf]?.groups?.[groupId]?.[day.dayName]?.routeId || '';
+  }
+
+  async function handleRouteChange(groupId: string, day: ScheduleDay, routeId: string | null) {
+    const key = `${groupId}:${day.dateStr}`;
     setSaving(key);
-
     try {
       const res = await fetch('/api/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          groupId,
-          day,
-          routeId,
-        }),
+        body: JSON.stringify({ groupId, day: day.dayName, weekOf: day.weekOf, dateStr: day.dateStr, routeId }),
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        // Update local state
-        setSchedule((prev) => {
+        setSchedules(prev => {
           const updated = { ...prev };
-          if (!updated.groups[groupId]) updated.groups[groupId] = {};
-          updated.groups[groupId] = {
-            ...updated.groups[groupId],
-            [day]: {
-              routeId,
-              updatedAt: new Date().toISOString(),
-              updatedBy: sessionType === 'coach' ? 'Coach' : `Group: ${groupId}`,
-            },
+          if (!updated[day.weekOf]) updated[day.weekOf] = { weekOf: day.weekOf, groups: {} };
+          if (!updated[day.weekOf].groups[groupId]) updated[day.weekOf].groups[groupId] = {};
+          updated[day.weekOf].groups[groupId][day.dayName] = {
+            routeId,
+            updatedAt: new Date().toISOString(),
+            updatedBy: sessionType === 'coach' ? 'Coach' : groupId,
           };
           return updated;
         });
-        addToast('Route updated successfully', 'success');
+        addToast('Route updated', 'success');
       } else {
-        addToast(data.error || 'Failed to update route', 'error');
+        addToast(data.error || 'Failed to update', 'error');
       }
     } catch {
-      addToast('Network error. Please try again.', 'error');
+      addToast('Network error', 'error');
     } finally {
       setSaving(null);
     }
   }
 
-  function formatWeekOf(dateStr: string): string {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  }
-
   return (
     <div>
-      {/* Toast notifications */}
+      {/* Toasts */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 transition-all ${
-              toast.type === 'success'
-                ? 'bg-green-600 text-white'
-                : 'bg-red-600 text-white'
-            }`}
-          >
-            {toast.type === 'success' ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
+        {toasts.map(toast => (
+          <div key={toast.id} className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 ${toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+            {toast.type === 'success'
+              ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            }
             {toast.message}
           </div>
         ))}
       </div>
 
-      {/* Week header */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Week of {formatWeekOf(weekOf)}</h2>
+          <h2 className="text-xl font-bold text-gray-800">
+            {days[0]?.label} – {days[days.length - 1]?.label}
+          </h2>
           <p className="text-sm text-gray-500 mt-0.5">
             {sessionType === 'coach' ? 'Managing all groups' : `${visibleGroups[0]?.name} schedule`}
           </p>
@@ -197,15 +134,14 @@ export default function ScheduleEditor({
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <span>Locked after 5pm</span>
+          Locked after 5pm
         </div>
       </div>
 
-      {/* Group schedule cards */}
+      {/* Group cards */}
       <div className={`grid gap-6 ${visibleGroups.length === 1 ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'}`}>
-        {visibleGroups.map((group) => {
+        {visibleGroups.map(group => {
           const colors = COLOR_MAP[group.color] || COLOR_MAP.purple;
-          const groupSchedule = schedule.groups[group.id];
 
           return (
             <div key={group.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -218,57 +154,46 @@ export default function ScheduleEditor({
                     className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm transition-colors"
                   >
                     <span>{group.runners.length} runners</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${expandedRosters[group.id] ? 'rotate-90' : ''}`}
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    >
+                    <svg className={`w-4 h-4 transition-transform ${expandedRosters[group.id] ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                 </div>
                 {expandedRosters[group.id] && (
-                  <div className="mt-3 pt-3 border-t border-white/20">
-                    <div className="flex flex-wrap gap-1.5">
-                      {group.runners.map((runner) => (
-                        <span key={runner} className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">
-                          {runner}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="mt-3 pt-3 border-t border-white/20 flex flex-wrap gap-1.5">
+                    {group.runners.map(runner => (
+                      <span key={runner} className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">{runner}</span>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Days */}
               <div className="divide-y divide-gray-100">
-                {DAYS.map((day) => {
-                  const locked = isDayLocked(day, todayDayName, currentHour);
-                  const dayData = groupSchedule?.[day];
-                  const currentRouteId = dayData?.routeId || '';
-                  const isSaving = saving === `${group.id}:${day}`;
-                  const isToday = todayDayName === day;
+                {days.map(day => {
+                  const locked = isDayLocked(day);
+                  const currentRouteId = getRouteId(group.id, day);
+                  const isSaving = saving === `${group.id}:${day.dateStr}`;
+                  const selectedRoute = routes.find(r => r.id === currentRouteId);
 
                   return (
-                    <div
-                      key={day}
-                      className={`px-5 py-3.5 ${locked ? 'bg-gray-50' : 'hover:bg-gray-50/50'} transition-colors`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Day label */}
-                        <div className="w-20 flex-shrink-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className={`text-sm font-semibold ${isToday ? colors.accent : 'text-gray-700'}`}>
-                              {DAY_LABELS[day]}
+                    <div key={day.dateStr} className={`px-5 py-4 ${locked ? 'bg-gray-50' : ''}`}>
+                      {/* Day label row */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-32 flex-shrink-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-semibold ${day.isToday ? colors.accent : 'text-gray-700'}`}>
+                              {day.label}
                             </span>
-                            {isToday && (
-                              <span className={`text-xs ${colors.badge} px-1.5 py-0.5 rounded-full font-medium`}>
+                            {day.isToday && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${colors.todayBadge}`}>
                                 Today
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* Route selector or locked display */}
+                        {/* Route selector */}
                         <div className="flex-1">
                           {locked ? (
                             <div className="flex items-center gap-2">
@@ -276,49 +201,43 @@ export default function ScheduleEditor({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                               </svg>
                               <span className="text-sm text-gray-500">
-                                {currentRouteId
-                                  ? routes.find((r) => r.id === currentRouteId)?.name || 'Unknown route'
-                                  : 'No route assigned'}
+                                {selectedRoute?.name || 'No route assigned'}
                               </span>
                             </div>
                           ) : (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <select
-                                  value={currentRouteId}
-                                  onChange={(e) => handleRouteChange(group.id, day, e.target.value || null)}
-                                  disabled={isSaving}
-                                  className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-wait cursor-pointer"
-                                >
-                                  <option value="">— No route (TBD) —</option>
-                                  {routes.map((route) => (
-                                    <option key={route.id} value={route.id}>
-                                      {route.name}{route.distance ? ` (${route.distance})` : ''}
-                                    </option>
-                                  ))}
-                                </select>
-                                {isSaving && (
-                                  <svg className="animate-spin h-4 w-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                  </svg>
-                                )}
-                              </div>
-                              {currentRouteId && (() => {
-                                const selectedRoute = routes.find((r) => r.id === currentRouteId);
-                                return selectedRoute ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
-                                    src={`/routes/${selectedRoute.imageFile}`}
-                                    alt={selectedRoute.name}
-                                    className="w-full rounded-lg object-contain max-h-48 border border-gray-100"
-                                  />
-                                ) : null;
-                              })()}
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={currentRouteId}
+                                onChange={e => handleRouteChange(group.id, day, e.target.value || null)}
+                                disabled={isSaving}
+                                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 cursor-pointer"
+                              >
+                                <option value="">— No route (TBD) —</option>
+                                {routes.map(route => (
+                                  <option key={route.id} value={route.id}>{route.name}</option>
+                                ))}
+                              </select>
+                              {isSaving && (
+                                <svg className="animate-spin h-4 w-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                              )}
                             </div>
                           )}
                         </div>
                       </div>
+
+                      {/* Route image — full width below the row */}
+                      {selectedRoute && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={`/routes/${selectedRoute.imageFile}`}
+                          alt={selectedRoute.name}
+                          className="w-full rounded-lg border border-gray-100"
+                          style={{ maxHeight: '320px', objectFit: 'contain', objectPosition: 'center' }}
+                        />
+                      )}
                     </div>
                   );
                 })}
@@ -327,14 +246,6 @@ export default function ScheduleEditor({
           );
         })}
       </div>
-
-      {/* Weekend message */}
-      {(todayDayName === null) && (
-        <div className="mt-6 bg-purple-50 border border-purple-200 rounded-xl p-5 text-center">
-          <p className="text-purple-700 font-medium">It&apos;s the weekend!</p>
-          <p className="text-purple-600 text-sm mt-1">Next week&apos;s schedule starts Monday. You can set routes for next week now.</p>
-        </div>
-      )}
     </div>
   );
 }
