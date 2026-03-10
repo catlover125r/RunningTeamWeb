@@ -86,14 +86,12 @@ export default async function HomePage() {
                       <>
                         <div className="px-5 pt-4 pb-2">
                           <h3 className="font-bold text-xl text-gray-900">{route.name}</h3>
-                          {route.distance && <p className="text-purple-700 font-medium text-sm mt-1">{route.distance}</p>}
-                          <p className="text-gray-500 text-sm mt-1">{route.description}</p>
                         </div>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={`/routes/${route.imageFile}`}
                           alt={route.name}
-                          className="w-full object-contain"
+                          className="w-full object-contain max-h-96"
                         />
                       </>
                     ) : (
