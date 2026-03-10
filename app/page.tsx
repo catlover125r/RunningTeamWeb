@@ -1,20 +1,6 @@
-import { Announcement, Route, WeekSchedule } from '@/lib/types';
+import { Route } from '@/lib/types';
+import { getConfig, getSchedule, getAnnouncements, getMondayOfWeek } from '@/lib/data';
 import AnnouncementBanner from './components/AnnouncementBanner';
-
-interface PublicGroup {
-  id: string;
-  name: string;
-  color: string;
-  runners: string[];
-}
-
-interface PublicData {
-  groups: PublicGroup[];
-  routes: Route[];
-  weekOf: string;
-  schedule: WeekSchedule | null;
-  announcements: Announcement[];
-}
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
 const DAY_LABELS: Record<string, string> = {
@@ -51,15 +37,13 @@ function formatWeekOf(weekOf: string): string {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-async function getPublicData(): Promise<PublicData> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/public`, { cache: 'no-store' });
-  return res.json();
-}
-
 export default async function HomePage() {
-  const data = await getPublicData();
-  const { groups, routes, weekOf, schedule, announcements } = data;
+  const config = await getConfig();
+  const weekOf = getMondayOfWeek(new Date());
+  const schedule = await getSchedule(weekOf);
+  const announcements = await getAnnouncements();
+  const groups = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
+  const routes = config.routes;
 
   function getRoute(routeId: string | null): Route | null {
     if (!routeId) return null;
