@@ -93,7 +93,7 @@ export default async function HomePage() {
                         <img
                           src={`/routes/${route.imageFile}`}
                           alt={route.name}
-                          className="w-full object-contain max-h-64"
+                          className="w-full object-contain"
                         />
                       </>
                     ) : (
