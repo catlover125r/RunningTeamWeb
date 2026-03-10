@@ -98,6 +98,7 @@ export default function ScheduleEditor({
   );
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [saving, setSaving] = useState<string | null>(null); // "groupId:day"
+  const [expandedRosters, setExpandedRosters] = useState<Record<string, boolean>>({});
 
   const addToast = useCallback((message: string, type: 'success' | 'error') => {
     const id = Date.now();
@@ -212,8 +213,30 @@ export default function ScheduleEditor({
               <div className={`${colors.headerBg} px-5 py-4`}>
                 <div className="flex items-center justify-between">
                   <h3 className="text-white font-bold text-lg">{group.name}</h3>
-                  <span className="text-white text-opacity-80 text-sm">{group.runners.length} runners</span>
+                  <button
+                    onClick={() => setExpandedRosters(prev => ({ ...prev, [group.id]: !prev[group.id] }))}
+                    className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm transition-colors"
+                  >
+                    <span>{group.runners.length} runners</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${expandedRosters[group.id] ? 'rotate-90' : ''}`}
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
+                {expandedRosters[group.id] && (
+                  <div className="mt-3 pt-3 border-t border-white/20">
+                    <div className="flex flex-wrap gap-1.5">
+                      {group.runners.map((runner) => (
+                        <span key={runner} className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">
+                          {runner}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Days */}
