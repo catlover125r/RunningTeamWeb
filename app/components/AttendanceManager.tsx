@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { AttendanceRecord, AttendanceStatus, AttendanceRosterSection } from '@/lib/types';
 
 interface Props {
@@ -58,6 +58,8 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstRender = useRef(true);
 
   const allRunners = roster.flatMap(s => s.runners);
 
@@ -96,24 +98,29 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
     });
   }
 
-  async function handleSave() {
-    setSaving(true);
-    setSaveSuccess(false);
-    const existing = getRecord(selectedDate);
-    const runners = allRunners.map(name => ({
-      name,
-      status: existing?.runners.find(r => r.name === name)?.status ?? 'unknown',
-    }));
-    try {
-      const res = await fetch('/api/attendance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: selectedDate, runners }),
-      });
-      if (res.ok) { setSaveSuccess(true); setTimeout(() => setSaveSuccess(false), 2000); }
-    } catch { /* silent */ }
-    finally { setSaving(false); }
-  }
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(async () => {
+      setSaving(true);
+      setSaveSuccess(false);
+      const existing = getRecord(selectedDate);
+      const runners = allRunners.map(name => ({
+        name,
+        status: existing?.runners.find(r => r.name === name)?.status ?? 'unknown',
+      }));
+      try {
+        const res = await fetch('/api/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: selectedDate, runners }),
+        });
+        if (res.ok) { setSaveSuccess(true); setTimeout(() => setSaveSuccess(false), 2000); }
+      } catch { /* silent */ }
+      finally { setSaving(false); }
+    }, 800);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [records, selectedDate]);
 
   const presentCount = allRunners.filter(n => getStatus(n) === 'present').length;
   const absentCount = allRunners.filter(n => getStatus(n) === 'absent').length;
@@ -161,7 +168,11 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
       )}
 
       {/* Top action bar */}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-400">
+          {saving && <span>Saving…</span>}
+          {!saving && saveSuccess && <span className="text-green-600">Saved</span>}
+        </div>
         <button
           onClick={() => setShowReport(true)}
           className="px-4 py-2 text-sm font-medium text-purple-700 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
@@ -235,17 +246,6 @@ export default function AttendanceManager({ roster, initialRecords, today }: Pro
           ))}
         </div>
 
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className={`px-6 py-2.5 font-medium rounded-lg transition-all text-sm ${
-              saveSuccess ? 'bg-green-600 text-white' : 'bg-purple-700 hover:bg-purple-800 text-white'
-            } disabled:opacity-50`}
-          >
-            {saving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Attendance'}
-          </button>
-        </div>
       </div>
 
       {/* Recent records */}
