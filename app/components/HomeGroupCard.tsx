@@ -23,12 +23,9 @@ export default function HomeGroupCard({ name, runners, colors, routeName, imageF
   return (
     <div className={`rounded-xl border-2 ${colors.border} ${colors.bg} overflow-hidden shadow-sm`}>
       <div className="px-5 py-4 flex items-center justify-between">
-        <div>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${colors.badge}`}>
-            {name}
-          </span>
-          <p className="text-xs text-gray-500 mt-1">Today&apos;s Route</p>
-        </div>
+        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${colors.badge}`}>
+          {name}
+        </span>
         <button
           onClick={() => setExpanded(prev => !prev)}
           className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
