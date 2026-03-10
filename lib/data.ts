@@ -78,7 +78,7 @@ const DEFAULT_CONFIG: Config = {
     { id: 'around-school', name: 'Around the School', description: 'Short loop around the school campus', distance: '', imageFile: 'around-school.png' },
     { id: 'prison', name: 'Prison', description: 'Run out toward the waterfront near the old prison', distance: '', imageFile: 'prison.png' },
     { id: 'terris', name: 'Terris', description: 'Loop through the Terris neighborhood', distance: '', imageFile: 'terris.png' },
-    { id: 'burton', name: 'Burton', description: 'Long loop through Burton and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
+    { id: 'burton', name: 'Britten', description: 'Long loop through Britten and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
     { id: 'laural-trader-joes', name: 'Laural/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
     { id: 'stulsaft', name: 'Stulsaft', description: 'Loop through the hills toward Stulsaft Park', distance: '', imageFile: 'stulsaft.png' },
     { id: 'howard', name: 'Howard', description: 'Loop through the Howard neighborhood', distance: '', imageFile: 'howard.png' },
@@ -92,7 +92,15 @@ export async function getConfig(): Promise<Config> {
     await db.collection('config').doc('main').set(DEFAULT_CONFIG);
     return DEFAULT_CONFIG;
   }
-  return doc.data() as Config;
+  const config = doc.data() as Config;
+  // Migration: rename 'Burton' → 'Britten'
+  const burtonRoute = config.routes?.find(r => r.id === 'burton' && r.name === 'Burton');
+  if (burtonRoute) {
+    burtonRoute.name = 'Britten';
+    burtonRoute.description = 'Long loop through Britten and surrounding neighborhoods';
+    await db.collection('config').doc('main').set(config);
+  }
+  return config;
 }
 
 export async function saveConfig(config: Config): Promise<void> {
