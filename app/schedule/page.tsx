@@ -1,11 +1,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { getConfig, getSchedule, getUpcomingPracticeDays, getAnnouncements } from '@/lib/data';
+import { getConfig, getSchedule, getUpcomingPracticeDays } from '@/lib/data';
 import { WeekSchedule } from '@/lib/types';
 import ScheduleEditor from '@/app/components/ScheduleEditor';
-import AnnouncementsManager from '@/app/components/AnnouncementsManager';
-import ScheduleTabs from '@/app/components/ScheduleTabs';
 
 export default async function SchedulePage() {
   const cookieStore = await cookies();
@@ -29,42 +27,25 @@ export default async function SchedulePage() {
   const currentHour = now.getHours();
   const publicGroups = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
 
-  const announcements = session.type === 'coach' ? await getAnnouncements() : [];
-
-  const scheduleEditor = (
-    <ScheduleEditor
-      groups={publicGroups}
-      routes={config.routes}
-      days={days}
-      initialSchedules={schedules}
-      sessionType={session.type}
-      sessionGroupId={session.groupId}
-      todayDateStr={todayDateStr}
-      currentHour={currentHour}
-    />
-  );
-
-  if (session.type !== 'coach') {
-    return (
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Schedule</h1>
-          <p className="text-gray-500">Your group&apos;s upcoming practice routes.</p>
-        </div>
-        {scheduleEditor}
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Coach Dashboard</h1>
-        <p className="text-gray-500">Manage schedules and team announcements.</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Schedule</h1>
+        <p className="text-gray-500">
+          {session.type === 'coach'
+            ? 'Assign routes to any group for the next 5 practice days.'
+            : `Set routes for your group's upcoming practices.`}
+        </p>
       </div>
-      <ScheduleTabs
-        scheduleEditor={scheduleEditor}
-        announcementsManager={<AnnouncementsManager initialAnnouncements={announcements} />}
+      <ScheduleEditor
+        groups={publicGroups}
+        routes={config.routes}
+        days={days}
+        initialSchedules={schedules}
+        sessionType={session.type}
+        sessionGroupId={session.groupId}
+        todayDateStr={todayDateStr}
+        currentHour={currentHour}
       />
     </div>
   );

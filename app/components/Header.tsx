@@ -44,6 +44,11 @@ export default function Header({ isLoggedIn, isCoach }: HeaderProps) {
               Attendance
             </Link>
           )}
+          {isCoach && (
+            <Link href="/announcements" className="px-3 py-2 rounded-md text-sm text-purple-200 hover:text-white hover:bg-purple-700 transition-colors">
+              Announcements
+            </Link>
+          )}
           {isLoggedIn ? (
             <button
               onClick={handleLogout}

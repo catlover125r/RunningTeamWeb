@@ -24,7 +24,7 @@ const DEFAULT_CONFIG: Config = {
       name: 'Boys JV (12)',
       color: 'blue',
       accessCode: '7031',
-      runners: ['Brennan Sherman', 'Cole Boggs'],
+      runners: ['Brennan Sherman', 'Cole Myers'],
     },
     {
       id: 'boys-jv-9',
