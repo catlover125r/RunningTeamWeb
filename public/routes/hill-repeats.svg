@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fed7aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#bg)" />
+  <polyline points="50,320 200,120 350,320 500,80 650,320 750,320" fill="none" stroke="#c2410c" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="200" cy="120" r="8" fill="#c2410c"/>
+  <circle cx="500" cy="80" r="8" fill="#c2410c"/>
+  <text x="400" y="370" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="bold" fill="#7c2d12">Hill Repeats · 4.5 miles</text>
+</svg>

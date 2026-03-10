@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef9c3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#eab308;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#bg)" />
+  <!-- Outer track -->
+  <rect x="100" y="80" width="600" height="240" rx="120" ry="120" fill="none" stroke="#854d0e" stroke-width="14"/>
+  <!-- Inner track -->
+  <rect x="160" y="130" width="480" height="140" rx="70" ry="70" fill="none" stroke="#a16207" stroke-width="6" stroke-dasharray="15,8"/>
+  <!-- Lane lines -->
+  <line x1="400" y1="80" x2="400" y2="108" stroke="#854d0e" stroke-width="3"/>
+  <line x1="400" y1="292" x2="400" y2="320" stroke="#854d0e" stroke-width="3"/>
+  <text x="400" y="370" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="bold" fill="#78350f">Track Workout · 4.0 miles</text>
+</svg>
