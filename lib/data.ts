@@ -78,7 +78,7 @@ const DEFAULT_CONFIG: Config = {
     { id: 'around-school', name: 'Around the School', description: 'Short loop around the school campus', distance: '', imageFile: 'around-school.png' },
     { id: 'prison', name: 'Prison', description: 'Run out toward the waterfront near the old prison', distance: '', imageFile: 'prison.png' },
     { id: 'terris', name: 'Terris', description: 'Loop through the Terris neighborhood', distance: '', imageFile: 'terris.png' },
-    { id: 'burton', name: 'Britten', description: 'Long loop through Britten and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
+    { id: 'burton', name: 'Burton', description: 'Long loop through Burton and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
     { id: 'burton-out-and-back', name: 'Burton (Out & Back)', description: 'Out and back from school to Redwood City via Cedar St', distance: '', imageFile: 'burton-out-and-back.png' },
     { id: 'laural-trader-joes', name: 'Laural/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
     { id: 'stulsaft', name: 'Stulsaft', description: 'Loop through the hills toward Stulsaft Park', distance: '', imageFile: 'stulsaft.png' },
@@ -95,11 +95,11 @@ export async function getConfig(): Promise<Config> {
   }
   const config = doc.data() as Config;
   let dirty = false;
-  // Migration: rename 'Burton' → 'Britten'
-  const burtonRoute = config.routes?.find(r => r.id === 'burton' && r.name === 'Burton');
+  // Migration: ensure 'burton' route has correct name 'Burton'
+  const burtonRoute = config.routes?.find(r => r.id === 'burton' && r.name !== 'Burton');
   if (burtonRoute) {
-    burtonRoute.name = 'Britten';
-    burtonRoute.description = 'Long loop through Britten and surrounding neighborhoods';
+    burtonRoute.name = 'Burton';
+    burtonRoute.description = 'Long loop through Burton and surrounding neighborhoods';
     dirty = true;
   }
   // Migration: add 'Burton (Out & Back)' if missing
