@@ -27,6 +27,16 @@ const COLOR_MAP: Record<string, { tab: string; activeTab: string; present: strin
     activeTab: 'bg-green-600 text-white border-green-600',
     present: 'bg-green-100 text-green-800',
   },
+  purple: {
+    tab: 'border-purple-200 text-purple-700',
+    activeTab: 'bg-purple-700 text-white border-purple-700',
+    present: 'bg-purple-100 text-purple-800',
+  },
+  pink: {
+    tab: 'border-pink-200 text-pink-600',
+    activeTab: 'bg-pink-600 text-white border-pink-600',
+    present: 'bg-pink-100 text-pink-800',
+  },
   orange: {
     tab: 'border-orange-200 text-orange-700',
     activeTab: 'bg-orange-500 text-white border-orange-500',
@@ -154,7 +164,7 @@ export default function AttendanceManager({ groups, initialRecords, today }: Pro
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Group</label>
             <div className="flex gap-2">
               {groups.map((group) => {
-                const colors = COLOR_MAP[group.color] || COLOR_MAP.blue;
+                const colors = COLOR_MAP[group.color] || COLOR_MAP.purple;
                 const isActive = group.id === selectedGroupId;
                 return (
                   <button
@@ -193,7 +203,7 @@ export default function AttendanceManager({ groups, initialRecords, today }: Pro
         {/* Runner list */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
           {runnerStates.map(({ name, present }) => {
-            const colors = COLOR_MAP[selectedGroup?.color || 'blue'] || COLOR_MAP.blue;
+            const colors = COLOR_MAP[selectedGroup?.color || 'purple'] || COLOR_MAP.purple;
             return (
               <button
                 key={name}

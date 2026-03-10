@@ -54,6 +54,18 @@ const COLOR_MAP: Record<string, {
     accent: 'text-orange-600',
     lockedBg: 'bg-orange-50',
   },
+  purple: {
+    headerBg: 'bg-purple-700',
+    badge: 'bg-purple-100 text-purple-800',
+    accent: 'text-purple-600',
+    lockedBg: 'bg-purple-50',
+  },
+  pink: {
+    headerBg: 'bg-pink-600',
+    badge: 'bg-pink-100 text-pink-800',
+    accent: 'text-pink-600',
+    lockedBg: 'bg-pink-50',
+  },
 };
 
 function isDayLocked(day: string, todayDayName: string | null, currentHour: number): boolean {
@@ -191,7 +203,7 @@ export default function ScheduleEditor({
       {/* Group schedule cards */}
       <div className={`grid gap-6 ${visibleGroups.length === 1 ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'}`}>
         {visibleGroups.map((group) => {
-          const colors = COLOR_MAP[group.color] || COLOR_MAP.blue;
+          const colors = COLOR_MAP[group.color] || COLOR_MAP.purple;
           const groupSchedule = schedule.groups[group.id];
 
           return (
@@ -252,7 +264,7 @@ export default function ScheduleEditor({
                                 value={currentRouteId}
                                 onChange={(e) => handleRouteChange(group.id, day, e.target.value || null)}
                                 disabled={isSaving}
-                                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-wait cursor-pointer"
+                                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-wait cursor-pointer"
                               >
                                 <option value="">— No route (TBD) —</option>
                                 {routes.map((route) => (
@@ -262,7 +274,7 @@ export default function ScheduleEditor({
                                 ))}
                               </select>
                               {isSaving && (
-                                <svg className="animate-spin h-4 w-4 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                                <svg className="animate-spin h-4 w-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                 </svg>
@@ -282,9 +294,9 @@ export default function ScheduleEditor({
 
       {/* Weekend message */}
       {(todayDayName === null) && (
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
-          <p className="text-blue-700 font-medium">It&apos;s the weekend!</p>
-          <p className="text-blue-600 text-sm mt-1">Next week&apos;s schedule starts Monday. You can set routes for next week now.</p>
+        <div className="mt-6 bg-purple-50 border border-purple-200 rounded-xl p-5 text-center">
+          <p className="text-purple-700 font-medium">It&apos;s the weekend!</p>
+          <p className="text-purple-600 text-sm mt-1">Next week&apos;s schedule starts Monday. You can set routes for next week now.</p>
         </div>
       )}
     </div>

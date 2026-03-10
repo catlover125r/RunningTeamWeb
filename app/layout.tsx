@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Lincoln High Running Team',
-  description: 'Route and schedule management for Lincoln High Running Team',
+  title: 'Sequoia XC',
+  description: 'Route and schedule management for Sequoia High School Cross Country',
 };
 
 export default async function RootLayout({
@@ -35,9 +35,9 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}>
         <Header isLoggedIn={isLoggedIn} isCoach={isCoach} />
         <main>{children}</main>
-        <footer className="mt-16 bg-blue-900 text-blue-300 text-center py-6 text-sm">
+        <footer className="mt-16 bg-purple-900 text-purple-300 text-center py-6 text-sm">
           <div className="max-w-6xl mx-auto px-4">
-            <p className="font-medium text-white mb-1">Lincoln High Running Team</p>
+            <p className="font-medium text-white mb-1">Sequoia High School XC</p>
             <p>Route management system &mdash; {new Date().getFullYear()}</p>
           </div>
         </footer>

@@ -3,28 +3,40 @@ import { Config, WeekSchedule, Announcement, AttendanceRecord } from './types';
 
 // Default config to seed Firestore on first run
 const DEFAULT_CONFIG: Config = {
-  coachCode: 'coach2024',
+  coachCode: '2947',
   groups: [
     {
-      id: 'varsity',
-      name: 'Varsity',
-      color: 'blue',
-      accessCode: 'varsity2024',
-      runners: ['Alex Johnson', 'Sam Williams', 'Jordan Davis', 'Taylor Brown', 'Casey Miller', 'Morgan Wilson', 'Riley Anderson', 'Jamie Thompson'],
+      id: 'boys',
+      name: 'Boys',
+      color: 'purple',
+      accessCode: '4829',
+      runners: [
+        'Aidan McGuire', 'Alex Corpos', 'Ari Guelman', 'Ben Carter', 'Brandon Dilley',
+        'Brennan Sherman', 'Caden Bernal', 'Cole Boggs', 'Cole Myers', 'Colin Henderson',
+        'Connor Dilley', 'Cooper Gaffney', 'Dylan Bringley', 'Elliot Rios', 'Enzo Zencirci',
+        'Fred Quontamatteo', 'Gian Carlo Lopez Acevedo', 'Hans Posch', 'Henry Giardi',
+        'Jacob Reynolds', 'Jacob Wallace', 'Jasper Vyas-Greene', 'Johnathan Huffer', 'Jose Can',
+        'Kai Rechin', 'Logan Trinklein', 'Luke Popler', 'Matthew Macedo', 'Meezahn Kemal',
+        'Nash Isaac Mamaril', 'Nickita Khylkouski', 'Reed Murphy', 'Sachin Paranjpye',
+        'Senahn Kemal', 'Theodore Tidwell', 'Tiernan Weaver', 'Trinidad Frias',
+        'Ulises Rugerio Gonzalez', 'Viggo Laustsen', 'Viliami Fuka', 'Wilfred Chacon Lopez',
+        'Will Raymond',
+      ],
     },
     {
-      id: 'jv',
-      name: 'Junior Varsity',
-      color: 'green',
-      accessCode: 'jv2024',
-      runners: ['Chris Martinez', 'Pat Garcia', 'Drew Robinson', 'Quinn Lewis', 'Avery Lee', 'Blake Walker', 'Sage Hall', 'River Young'],
-    },
-    {
-      id: 'freshman',
-      name: 'Freshman',
-      color: 'orange',
-      accessCode: 'freshman2024',
-      runners: ['Hayden King', 'Skyler Wright', 'Cameron Scott', 'Spencer Adams', 'Dakota Baker', 'Reese Nelson', 'Finley Carter', 'Emery Mitchell'],
+      id: 'girls',
+      name: 'Girls',
+      color: 'pink',
+      accessCode: '7153',
+      runners: [
+        'Abigail Ma', 'Abigail Machemer', 'Alisa Portner', 'Alize Hernandez', 'Amelia Ewing',
+        'Amelie Vieira', 'Amy Cruz Gonzalez', 'Audrey Bringley', 'Ava Wu', 'Brisa Rios',
+        'Camara Davis Duff', 'Delilah Hahn Tapper', 'Edyth Tidwell', 'Eleanor Talmadge',
+        'Elena Dils', 'Elisabetta Holloszy', 'Elise Leparmentier', 'Fei Hwang',
+        'Gabrielle Martin', 'Jakelin Garcia Rodriguez', 'Jazlynne Hernandez', 'Mia Zoepf',
+        'Nina Vijeh', 'Oceane Lacasse', 'Reese Skye', "Sabine O'Hara", 'Valentina Valencia',
+        'Yuliana Escatel Ramirez',
+      ],
     },
   ],
   routes: [

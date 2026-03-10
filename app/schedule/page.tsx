@@ -60,23 +60,22 @@ export default async function SchedulePage() {
   );
 }
 
-// Server component for the coach announcements panel placeholder
 function CoachAnnouncementPanel() {
   return (
     <div className="mb-8">
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
-        <div className="w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0">
+      <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3">
+        <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-amber-800 text-sm">Coach Access</p>
-          <p className="text-amber-700 text-xs">You can manage all groups&apos; schedules and post announcements.</p>
+          <p className="font-semibold text-purple-800 text-sm">Coach Access</p>
+          <p className="text-purple-700 text-xs">You can manage all groups&apos; schedules and post announcements.</p>
         </div>
         <a
           href="/announcements"
-          className="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md font-medium transition-colors"
+          className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md font-medium transition-colors"
         >
           Manage Announcements
         </a>
