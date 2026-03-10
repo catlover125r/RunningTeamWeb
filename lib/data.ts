@@ -79,6 +79,7 @@ const DEFAULT_CONFIG: Config = {
     { id: 'prison', name: 'Prison', description: 'Run out toward the waterfront near the old prison', distance: '', imageFile: 'prison.png' },
     { id: 'terris', name: 'Terris', description: 'Loop through the Terris neighborhood', distance: '', imageFile: 'terris.png' },
     { id: 'burton', name: 'Britten', description: 'Long loop through Britten and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
+    { id: 'burton-out-and-back', name: 'Burton (Out & Back)', description: 'Out and back from school to Redwood City via Cedar St', distance: '', imageFile: 'burton-out-and-back.png' },
     { id: 'laural-trader-joes', name: 'Laural/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
     { id: 'stulsaft', name: 'Stulsaft', description: 'Loop through the hills toward Stulsaft Park', distance: '', imageFile: 'stulsaft.png' },
     { id: 'howard', name: 'Howard', description: 'Loop through the Howard neighborhood', distance: '', imageFile: 'howard.png' },
@@ -93,11 +94,21 @@ export async function getConfig(): Promise<Config> {
     return DEFAULT_CONFIG;
   }
   const config = doc.data() as Config;
+  let dirty = false;
   // Migration: rename 'Burton' → 'Britten'
   const burtonRoute = config.routes?.find(r => r.id === 'burton' && r.name === 'Burton');
   if (burtonRoute) {
     burtonRoute.name = 'Britten';
     burtonRoute.description = 'Long loop through Britten and surrounding neighborhoods';
+    dirty = true;
+  }
+  // Migration: add 'Burton (Out & Back)' if missing
+  if (!config.routes?.find(r => r.id === 'burton-out-and-back')) {
+    config.routes = config.routes ?? [];
+    config.routes.push({ id: 'burton-out-and-back', name: 'Burton (Out & Back)', description: 'Out and back from school to Redwood City via Cedar St', distance: '', imageFile: 'burton-out-and-back.png' });
+    dirty = true;
+  }
+  if (dirty) {
     await db.collection('config').doc('main').set(config);
   }
   return config;
