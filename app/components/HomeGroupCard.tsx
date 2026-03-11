@@ -65,6 +65,14 @@ export default function HomeGroupCard({ name, runners, colors, routeName, imageF
               />
             </div>
           </>
+        ) : routeName ? (
+          <div className="px-5 py-5 flex items-center gap-3">
+            <span className="text-2xl">🏟️</span>
+            <div>
+              <p className="font-bold text-gray-900">{routeName}</p>
+              <p className="text-sm text-gray-500">On the track today</p>
+            </div>
+          </div>
         ) : (
           <p className="px-5 py-5 text-gray-400 italic">No route assigned yet</p>
         )}

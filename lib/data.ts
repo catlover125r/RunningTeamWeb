@@ -71,6 +71,7 @@ const DEFAULT_CONFIG: Config = {
     },
   ],
   routes: [
+    { id: 'track-workout', name: 'Track Workout', description: 'Workout on the track — no route', distance: '', imageFile: '' },
     { id: 'britten', name: 'Brittan', description: 'Loop through the Brittan neighborhood', distance: '', imageFile: 'britten.png' },
     { id: 'bair-island', name: 'Bair Island', description: 'Out and back to Bair Island along the bay', distance: '', imageFile: 'bair-island.png' },
     { id: 'emerald-hills', name: 'Emerald Hills', description: 'Hilly loop through Emerald Hills', distance: '', imageFile: 'emerald-hills.png' },
@@ -95,6 +96,12 @@ export async function getConfig(): Promise<Config> {
   }
   const config = doc.data() as Config;
   let dirty = false;
+  // Migration: add 'track-workout' route if missing
+  if (!config.routes?.find(r => r.id === 'track-workout')) {
+    config.routes = config.routes ?? [];
+    config.routes.unshift({ id: 'track-workout', name: 'Track Workout', description: 'Workout on the track — no route', distance: '', imageFile: '' });
+    dirty = true;
+  }
   // Migration: fix route name spellings
   const routeNameFixes: Record<string, string> = { britten: 'Brittan', terris: 'Terrace', 'laural-trader-joes': 'Laurel/Trader Joes' };
   for (const route of config.routes ?? []) {

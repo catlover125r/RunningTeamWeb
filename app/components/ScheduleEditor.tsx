@@ -214,9 +214,12 @@ export default function ScheduleEditor({
                                 className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 cursor-pointer"
                               >
                                 <option value="">— No route (TBD) —</option>
-                                {routes.map(route => (
-                                  <option key={route.id} value={route.id}>{route.name}</option>
-                                ))}
+                                <option value="track-workout">Track Workout</option>
+                                <optgroup label="Routes">
+                                  {routes.filter(r => r.id !== 'track-workout').map(route => (
+                                    <option key={route.id} value={route.id}>{route.name}</option>
+                                  ))}
+                                </optgroup>
                               </select>
                               {isSaving && (
                                 <svg className="animate-spin h-4 w-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24">
@@ -230,7 +233,7 @@ export default function ScheduleEditor({
                       </div>
 
                       {/* Route image — full width below the row */}
-                      {selectedRoute && (
+                      {selectedRoute && selectedRoute.imageFile && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={`/routes/${selectedRoute.imageFile}`}
