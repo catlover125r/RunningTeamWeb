@@ -16,9 +16,7 @@ export default function Header({ isLoggedIn, isCoach }: HeaderProps) {
 
   async function handleLogout() {
     await fetch('/api/logout', { method: 'POST' });
-    setSidebarOpen(false);
-    router.refresh();
-    router.push('/');
+    window.location.href = '/';
   }
 
   const navLinks = (

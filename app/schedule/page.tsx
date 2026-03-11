@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { getConfig, getSchedule, getUpcomingPracticeDays } from '@/lib/data';
+import { getConfig, getSchedule, getUpcomingPracticeDays, nowInPacific } from '@/lib/data';
 import { WeekSchedule } from '@/lib/types';
 import ScheduleEditor from '@/app/components/ScheduleEditor';
 
@@ -15,16 +15,14 @@ export default async function SchedulePage() {
 
   const config = await getConfig();
   const now = new Date();
-  const days = getUpcomingPracticeDays(now);
+  const { hour: currentHour, dateStr: todayDateStr, date: nowPT } = nowInPacific();
+  const days = getUpcomingPracticeDays(nowPT);
 
   const uniqueWeeks = [...new Set(days.map(d => d.weekOf))];
   const weekSchedules = await Promise.all(uniqueWeeks.map(w => getSchedule(w)));
   const schedules: Record<string, WeekSchedule> = Object.fromEntries(
     uniqueWeeks.map((w, i) => [w, weekSchedules[i]])
   );
-
-  const todayDateStr = now.toISOString().split('T')[0];
-  const currentHour = now.getHours();
   const publicGroups = config.groups.map(({ accessCode: _ac, ...rest }) => rest);
 
   return (

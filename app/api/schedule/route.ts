@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getConfig, getSchedule, saveSchedule, getMondayOfWeek } from '@/lib/data';
+import { getConfig, getSchedule, saveSchedule, getMondayOfWeek, nowInPacific } from '@/lib/data';
 import { DaySchedule } from '@/lib/types';
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -38,8 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const currentHour = now.getHours();
+  const { hour: currentHour, dateStr: todayStr } = nowInPacific();
 
   // Check past days and 5pm cutoff using dateStr if provided, else fall back to day-of-week logic
   if (dateStr) {

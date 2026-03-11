@@ -46,7 +46,7 @@ const DEFAULT_CONFIG: Config = {
       label: 'Boys',
       runners: [
         'Aidan McGuire', 'Alex Corpos', 'Ari Guelman', 'Ben Carter', 'Brandon Dilley',
-        'Brennan Sherman', 'Caden Bernal', 'Cole Boggs', 'Cole Myers', 'Colin Henderson',
+        'Brennan Sherman', 'Caden Bernal', 'Cole Myers', 'Colin Henderson',
         'Connor Dilley', 'Cooper Gaffney', 'Dylan Bringley', 'Elliot Rios', 'Enzo Zencirci',
         'Fred Quontamatteo', 'Gian Carlo Lopez Acevedo', 'Hans Posch', 'Henry Giardi',
         'Jacob Reynolds', 'Jacob Wallace', 'Jasper Vyas-Greene', 'Johnathan Huffer',
@@ -108,6 +108,22 @@ export async function getConfig(): Promise<Config> {
     config.routes.push({ id: 'burton-out-and-back', name: 'Burton (Out & Back)', description: 'Out and back from school to Redwood City via Cedar St', distance: '', imageFile: 'burton-out-and-back.png' });
     dirty = true;
   }
+  // Migration: remove Cole Boggs from attendance roster (not on track team)
+  const boysRoster = config.attendanceRoster?.find(r => r.label === 'Boys');
+  if (boysRoster) {
+    const before = boysRoster.runners.length;
+    boysRoster.runners = boysRoster.runners.filter(n => n !== 'Cole Boggs');
+    if (boysRoster.runners.length !== before) dirty = true;
+  }
+  // Migration: fix Boys JV (12) — replace Cole Boggs with Cole Myers as Brennan's pair
+  const jv12 = config.groups?.find(g => g.id === 'boys-jv-12');
+  if (jv12) {
+    const boggsIdx = jv12.runners.indexOf('Cole Boggs');
+    if (boggsIdx !== -1) {
+      jv12.runners[boggsIdx] = 'Cole Myers';
+      dirty = true;
+    }
+  }
   if (dirty) {
     await db.collection('config').doc('main').set(config);
   }
@@ -117,6 +133,21 @@ export async function getConfig(): Promise<Config> {
 export async function saveConfig(config: Config): Promise<void> {
   const db = getDb();
   await db.collection('config').doc('main').set(config);
+}
+
+const PT_TIMEZONE = 'America/Los_Angeles';
+
+/** Returns a Date whose .getHours(), .getDate(), etc. reflect Pacific Time. */
+export function nowInPacific(): { date: Date; hour: number; dateStr: string } {
+  const now = new Date();
+  // Build a date string in PT using the locale trick (works reliably in Node with ICU)
+  const ptString = now.toLocaleString('en-US', { timeZone: PT_TIMEZONE });
+  const ptDate = new Date(ptString);
+  const h = ptDate.getHours();
+  const y = ptDate.getFullYear();
+  const m = String(ptDate.getMonth() + 1).padStart(2, '0');
+  const d = String(ptDate.getDate()).padStart(2, '0');
+  return { date: ptDate, hour: h, dateStr: `${y}-${m}-${d}` };
 }
 
 export function getMondayOfWeek(date: Date): string {
