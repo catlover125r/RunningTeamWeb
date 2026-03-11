@@ -233,7 +233,11 @@ export default function ScheduleEditor({
                       </div>
 
                       {/* Route image — full width below the row */}
-                      {selectedRoute && selectedRoute.imageFile && (
+                      {selectedRoute?.id === 'track-workout' ? (
+                        <div className="flex items-center gap-3 py-2 px-1 text-gray-500 text-sm italic">
+                          On the track today — no route
+                        </div>
+                      ) : selectedRoute?.imageFile ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={`/routes/${selectedRoute.imageFile}`}
@@ -241,7 +245,7 @@ export default function ScheduleEditor({
                           className="w-full rounded-2xl shadow-md"
                           style={{ maxHeight: '480px', objectFit: 'contain', objectPosition: 'center' }}
                         />
-                      )}
+                      ) : null}
                     </div>
                   );
                 })}

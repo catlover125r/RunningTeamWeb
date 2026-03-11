@@ -35,6 +35,7 @@ export default async function HomePage() {
     const groupSchedule = (schedule as WeekSchedule | null)?.groups?.[group.id];
     const routeId = groupSchedule?.[todayName]?.routeId;
     if (!routeId) return null;
+    if (routeId === 'track-workout') return { id: 'track-workout', name: 'Track Workout', description: '', distance: '', imageFile: '' };
     return config.routes.find((r) => r.id === routeId) || null;
   }
 
