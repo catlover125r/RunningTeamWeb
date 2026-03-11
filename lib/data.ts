@@ -71,16 +71,16 @@ const DEFAULT_CONFIG: Config = {
     },
   ],
   routes: [
-    { id: 'britten', name: 'Britten', description: 'Loop through the Britten neighborhood', distance: '', imageFile: 'britten.png' },
+    { id: 'britten', name: 'Brittan', description: 'Loop through the Brittan neighborhood', distance: '', imageFile: 'britten.png' },
     { id: 'bair-island', name: 'Bair Island', description: 'Out and back to Bair Island along the bay', distance: '', imageFile: 'bair-island.png' },
     { id: 'emerald-hills', name: 'Emerald Hills', description: 'Hilly loop through Emerald Hills', distance: '', imageFile: 'emerald-hills.png' },
     { id: 'mcloop', name: 'Mcloop', description: 'Loop through the neighborhood near Mcauley Park', distance: '', imageFile: 'mcloop.png' },
     { id: 'around-school', name: 'Around the School', description: 'Short loop around the school campus', distance: '', imageFile: 'around-school.png' },
     { id: 'prison', name: 'Prison', description: 'Run out toward the waterfront near the old prison', distance: '', imageFile: 'prison.png' },
-    { id: 'terris', name: 'Terris', description: 'Loop through the Terris neighborhood', distance: '', imageFile: 'terris.png' },
+    { id: 'terris', name: 'Terrace', description: 'Loop through the Terrace neighborhood', distance: '', imageFile: 'terris.png' },
     { id: 'burton', name: 'Burton', description: 'Long loop through Burton and surrounding neighborhoods', distance: '', imageFile: 'burton.png' },
     { id: 'burton-out-and-back', name: 'Burton (Out & Back)', description: 'Out and back from school to Redwood City via Cedar St', distance: '', imageFile: 'burton-out-and-back.png' },
-    { id: 'laural-trader-joes', name: 'Laural/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
+    { id: 'laural-trader-joes', name: 'Laurel/Trader Joes', description: 'Out and back to Trader Joes in San Carlos', distance: '', imageFile: 'laural-trader-joes.png' },
     { id: 'stulsaft', name: 'Stulsaft', description: 'Loop through the hills toward Stulsaft Park', distance: '', imageFile: 'stulsaft.png' },
     { id: 'howard', name: 'Howard', description: 'Loop through the Howard neighborhood', distance: '', imageFile: 'howard.png' },
   ],
@@ -95,6 +95,14 @@ export async function getConfig(): Promise<Config> {
   }
   const config = doc.data() as Config;
   let dirty = false;
+  // Migration: fix route name spellings
+  const routeNameFixes: Record<string, string> = { britten: 'Brittan', terris: 'Terrace', 'laural-trader-joes': 'Laurel/Trader Joes' };
+  for (const route of config.routes ?? []) {
+    if (routeNameFixes[route.id] && route.name !== routeNameFixes[route.id]) {
+      route.name = routeNameFixes[route.id];
+      dirty = true;
+    }
+  }
   // Migration: ensure 'burton' route has correct name 'Burton'
   const burtonRoute = config.routes?.find(r => r.id === 'burton' && r.name !== 'Burton');
   if (burtonRoute) {
